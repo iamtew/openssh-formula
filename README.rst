@@ -2,7 +2,7 @@ openssh
 =======
 Install and configure an openssh server.
 
-Modified [openssh-formula](https://github.com/saltstack-formulas/openssh-formula) with more CentOS like defaults.
+Modified `openssh-formula<https://github.com/saltstack-formulas/openssh-formula>` with more CentOS like defaults.
 
 .. note::
 
