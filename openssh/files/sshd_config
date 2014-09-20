@@ -74,8 +74,8 @@
 {{ option_default_uncommented('HostKey', ['/etc/ssh/ssh_host_rsa_key', '/etc/ssh/ssh_host_dsa_key', '/etc/ssh/ssh_host_ecdsa_key']) -}}
 
 # Lifetime and size of ephemeral version 1 server key
-{{ option_default_uncommented('KeyRegenerationInterval', '1h') }}
-{{ option_default_uncommented('ServerKeyBits', 1024) }}
+{{ option('KeyRegenerationInterval', '1h') }}
+{{ option('ServerKeyBits', 1024) }}
 
 # Ciphers and keying
 {{ option('RekeyLimit', 'default none') }}
@@ -95,8 +95,8 @@
 {{ option('MaxSessions', 10) }}
 
 {{ option('DSAAuthentication', 'yes') }}
-{{ option_default_uncommented('RSAAuthentication', 'yes') }}
-{{ option_default_uncommented('PubkeyAuthentication', 'yes') }}
+{{ option('RSAAuthentication', 'yes') }}
+{{ option('PubkeyAuthentication', 'yes') }}
 
 # The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
 # but this is overridden so installations will only check .ssh/authorized_keys
