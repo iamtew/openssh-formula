@@ -2,6 +2,8 @@ openssh
 =======
 Install and configure an openssh server.
 
+Modified [openssh-formula](https://github.com/saltstack-formulas/openssh-formula) with more CentOS like defaults.
+
 .. note::
 
     See the full `Salt Formulas installation and usage instructions
@@ -39,5 +41,5 @@ Installs the openssh client package.
 Installs the ssh daemon configuration file included in this formula
 (under "openssh/files"). This configuration file is populated
 by values from pillar. ``pillar.example`` results in the generation
-of the default ``sshd_config`` file on Debian Wheezy.
+of the default ``sshd_config`` file on CentOS 7.
 
