@@ -45,82 +45,97 @@
 # This file is managed by salt. Manual changes risk being overwritten.
 # The contents of the original sshd_config are kept on the bottom for
 # quick reference.
-# See the sshd_config(5) manpage for details
 
-# What ports, IPs and protocols we listen for
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/local/bin:/usr/bin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+# If you want to change the port on a SELinux system, you have to tell
+# SELinux about this change.
+# semanage port -a -t ssh_port_t -p tcp #PORTNUMBER
+#
 {{ option('Port', 22) }}
-# Use these options to restrict which interfaces/protocols sshd will bind to
+{{ option('AddressFamily', 'any') }}
 {{ option('ListenAddress', ['::', '0.0.0.0']) -}}
-{{ option_default_uncommented('Protocol', 2) }}
 
+# The default requires explicit activation of protocol 1
+{{ option('Protocol', 2) }}
+
+# HostKeys for protocol version 1
+{{ option('HostKey', ['/etc/ssh/ssh_host_key']) -}}
 # HostKeys for protocol version 2
 {{ option_default_uncommented('HostKey', ['/etc/ssh/ssh_host_rsa_key', '/etc/ssh/ssh_host_dsa_key', '/etc/ssh/ssh_host_ecdsa_key']) -}}
 
-#Privilege Separation is turned on for security
-{{ option_default_uncommented('UsePrivilegeSeparation', 'yes') }}
-
 # Lifetime and size of ephemeral version 1 server key
-{{ option_default_uncommented('KeyRegenerationInterval', 3600) }}
-{{ option_default_uncommented('ServerKeyBits', 768) }}
+{{ option_default_uncommented('KeyRegenerationInterval', '1h') }}
+{{ option_default_uncommented('ServerKeyBits', 1024) }}
+
+# Ciphers and keying
+{{ option('RekeyLimit', 'default none') }}
 
 # Logging
-{{ option_default_uncommented('SyslogFacility', 'AUTH') }}
-{{ option_default_uncommented('LogLevel', 'INFO') }}
+# obsoletes QuietMode and FascistLogging
+{{ option('SyslogFacility', 'AUTH') }}
+{{ option_default_uncommented('SyslogFacility', 'AUTHPRIV') }}
+{{ option('LogLevel', 'INFO') }}
 
 # Authentication:
-{{ option_default_uncommented('LoginGraceTime', 120) }}
-{{ option_default_uncommented('PermitRootLogin', 'no') }}
-{{ option_default_uncommented('StrictModes', 'yes') }}
+
+{{ option('LoginGraceTime', '2m') }}
+{{ option('PermitRootLogin', 'yes') }}
+{{ option('StrictModes', 'yes') }}
+{{ option('MaxAuthTries', 6) }}
+{{ option('MaxSessions', 10) }}
 
 {{ option('DSAAuthentication', 'yes') }}
 {{ option_default_uncommented('RSAAuthentication', 'yes') }}
 {{ option_default_uncommented('PubkeyAuthentication', 'yes') }}
-{{ option('AuthorizedKeysFile', '%h/.ssh/authorized_keys') }}
 
-# Don't read the user's ~/.rhosts and ~/.shosts files
-{{ option_default_uncommented('IgnoreRhosts', 'yes') }}
-# For this to work you will also need host keys in /etc/ssh_known_hosts
-{{ option_default_uncommented('RhostsRSAAuthentication', 'no') }}
+# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
+# but this is overridden so installations will only check .ssh/authorized_keys
+{{ option_default_uncommented('AuthorizedKeysFile', '%h/.ssh/authorized_keys') }}
+
+{{ option('AuthorizedPrincipalsFile', 'none') }}
+
+{{ option('AuthorizedKeysCommand', 'none') }}
+{{ option('AuthorizedKeysCommandUser', 'nobody') }}
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+{{ option('RhostsRSAAuthentication', 'no') }}
 # similar for protocol version 2
-{{ option_default_uncommented('HostbasedAuthentication', 'no') }}
-# Uncomment if you don't trust ~/.ssh/known_hosts for RhostsRSAAuthentication
-{{ option('IgnoreUserKnownHosts', 'yes') }}
+{{ option('HostbasedAuthentication', 'no') }}
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# RhostsRSAAuthentication and HostbasedAuthentication
+{{ option('IgnoreUserKnownHosts', 'no') }}
+# Don't read the user's ~/.rhosts and ~/.shosts files
+{{ option('IgnoreRhosts', 'yes') }}
 
-# To enable empty passwords, change to yes (NOT RECOMMENDED)
-{{ option_default_uncommented('PermitEmptyPasswords', 'no') }}
+# To disable tunneled clear text passwords, change to no here!
+{{ option_default_uncommented('PasswordAuthentication', 'yes') }}
+{{ option('PermitEmptyPasswords', 'no') }}
 
-# Change to yes to enable challenge-response passwords (beware issues with
-# some PAM modules and threads)
+# Change to no to disable s/key passwords
 {{ option_default_uncommented('ChallengeResponseAuthentication', 'no') }}
-
-# Change to no to disable tunnelled clear text passwords
-{{ option('PasswordAuthentication', 'yes') }}
 
 # Kerberos options
 {{ option('KerberosAuthentication', 'no') }}
-{{ option('KerberosGetAFSToken', 'no') }}
 {{ option('KerberosOrLocalPasswd', 'yes') }}
 {{ option('KerberosTicketCleanup', 'yes') }}
+{{ option('KerberosGetAFSToken', 'no') }}
+{{ option('KerberosUseKuserok', 'yes') }}
 
 # GSSAPI options
-{{ option('GSSAPIAuthentication', 'no') }}
-{{ option('GSSAPICleanupCredentials', 'yes') }}
-
-{{ option_default_uncommented('X11Forwarding', 'yes') }}
-{{ option('AllowTcpForwarding', 'yes') }}
-{{ option_default_uncommented('X11DisplayOffset', '10') }}
-{{ option_default_uncommented('PrintMotd', 'no') }}
-{{ option_default_uncommented('PrintLastLog', 'yes') }}
-{{ option_default_uncommented('TCPKeepAlive', 'yes') }}
-{{ option('UseLogin', 'no') }}
-
-{{ option('MaxStartups', '10:30:60') }}
-{{ option('Banner', '/etc/issue.net') }}
-
-# Allow client to pass locale environment variables
-{{ option_default_uncommented('AcceptEnv', 'LANG LC_*') }}
-
-{{ option_default_uncommented('Subsystem', 'sftp /usr/lib/openssh/sftp-server') }}
+{{ option_default_uncommented('GSSAPIAuthentication', 'yes') }}
+{{ option_default_uncommented('GSSAPICleanupCredentials', 'yes') }}
+{{ option('GSSAPIStrictAcceptorCheck', 'yes') }}
+{{ option('GSSAPIKeyExchange', 'no') }}
 
 # Set this to 'yes' to enable PAM authentication, account processing,
 # and session processing. If this is enabled, PAM authentication will
@@ -131,16 +146,57 @@
 # If you just want the PAM account and session checks to run without
 # PAM authentication, then enable this but set PasswordAuthentication
 # and ChallengeResponseAuthentication to 'no'.
+# WARNING: 'UsePAM no' is not supported in Red Hat Enterprise Linux and may cause several
+# problems.
 {{ option_default_uncommented('UsePAM', 'yes') }}
 
-# DNS resolve and map remote IP addresses
+{{ option('AllowAgentForwarding', 'yes') }}
+{{ option('AllowTcpForwarding', 'yes') }}
+{{ option('GatewayPorts', 'no') }}
+{{ option_default_uncommented('X11Forwarding', 'yes') }}
+{{ option('X11DisplayOffset', 10) }}
+{{ option('X11UseLocalhost', 'yes') }}
+{{ option('PrintMotd', 'yes') }}
+{{ option('PrintLastLog', 'yes') }}
+{{ option('TCPKeepAlive', 'yes') }}
+{{ option('UseLogin', 'no') }}
+{{ option_default_uncommented('UsePrivilegeSeparation', 'sandbox  # Default for new installations.') }}
+{{ option('PermitUserEnvironment', 'no') }}
+{{ option('Compression', 'delayed') }}
+{{ option('ClientAliveInterval', 0) }}
+{{ option('ClientAliveCountMax', 3) }}
+{{ option('ShowPatchLevel', 'no') }}
 {{ option('UseDNS', 'yes') }}
+{{ option('PidFile', '/var/run/sshd.pid') }}
+{{ option('MaxStartups', '10:30:100') }}
+{{ option('PermitTunnel', 'no') }}
+{{ option('ChrootDirectory', 'none') }}
+{{ option('VersionAddendum', 'none') }}
+
+# no default banner path
+{{ option('Banner', 'none') }}
+
+# Allow client to pass locale environment variables
+{{ option_default_uncommented('AcceptEnv', 'LANG LC_* XMODIFIERS') }}
+
+# override default of no subsystems
+{{ option_default_uncommented('Subsystem', 'sftp /usr/lib/openssh/sftp-server') }}
+
+# Uncomment this if you want to use .local domain
+#Host *.local
+#	CheckHostIP no
+
+# Example of overriding settings on a per-user basis
+#Match User anoncvs
+#	X11Forwarding no
+#	AllowTcpForwarding no
+#	ForceCommand cvs server
 
 {# Handling unknown in salt template options #}
 {%- for keyword in sshd_config.keys() %}
   {#- Matches have to be at the bottem and should be handled differently -#}
   {%- if not keyword in processed_options and keyword != 'matches' -%}
-{#- send a blank default as it doesn't matter -#} 
+{#- send a blank default as it doesn't matter -#}
 {{ render_option(keyword, '') }}
   {%- endif -%}
 {%- endfor %}
